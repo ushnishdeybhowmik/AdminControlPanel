@@ -145,7 +145,7 @@ public class AdminPanel implements graphicvars, sql_vars {
             preparedStatement.setInt(8, pres_id);
             int num = preparedStatement.executeUpdate();
             if (num > 0) {
-                System.out.println("Doctor Registered");
+                System.out.println("Patient Registered");
                 //Menu TO-DO
             } else {
                 System.out.println("Database Error");
@@ -158,6 +158,68 @@ public class AdminPanel implements graphicvars, sql_vars {
             while(result.next()){
                 System.out.println(result.getString("p_name") + "\n" + result.getInt("age") + "\n" + result.getString("email") + "\n" + result.getString("gender") + "\n" + result.getString("address") + "\n" + result.getString("mobileno") + "\n" + result.getInt("prescription_id") + "\n\n");
             }
+        }
+        else if(ch == 3){
+            System.out.println("Enter Patient ID");
+            int ID = sc.nextInt();
+            Statement statement = conn.createStatement();
+            ResultSet result = statement.executeQuery(R_Ptnt_Query_Specific + ID);
+            if(result.next()){
+                System.out.println("Enter Patient Name");
+                String name = sc.nextLine();
+                System.out.println("Enter Patient Email ID");
+                String email = sc.nextLine();
+                String pass = "";
+                boolean bool = false;
+                while (!bool) {
+                    System.out.println("Enter Account Password");
+                    String temp = sc.next();
+                    System.out.println("Re-enter Password");
+                    String temp2 = sc.next();
+                    if (temp.equals(temp2)) {
+                        pass = temp;
+                        bool = true;
+                    } else {
+                        System.out.println("Passwords Do Not Match");
+
+                    }
+                }
+                String gender = "";
+                bool = false;
+                while (!bool) {
+                    System.out.println("Enter Patient Gender.\n(M) for Male. (F) for Female. (T) for Transgenders.");
+                    String g = sc.next();
+                    if (g.equals("M") || g.equals("m") || g.equals("F") || g.equals("f") || g.equals("T") || g.equals("t")) {
+                        gender = g;
+                        bool = true;
+
+                    } else {
+                        System.out.println("Choice incorrect.");
+                    }
+                }
+                System.out.println("Enter Mobile Number");
+                String mobileno = sc.next();
+                System.out.println("Enter Address");
+                String address = sc.nextLine();
+                System.out.println("Enter Age");
+                int age = sc.nextInt();
+                System.out.println("Enter Prescription ID");
+                int pres_id = sc.nextInt();
+
+                String query = U_Ptnt_Query + "p_name = '" + name + "', email = '" + email + "' password = '" + pass + "' gender = '" + gender + "' mobileno = '" + mobileno + "' address = '" + address + "' age = '" + age + "' prescription_id = '" + pres_id + "' "+ U_Ptnt_Query_2 + ID;
+                PreparedStatement preparedStatement = conn.prepareStatement(query);
+                int num = preparedStatement.executeUpdate();
+                if (num > 0) {
+                    System.out.println("Patient Updated");
+                    //Menu TO-DO
+                } else {
+                    System.out.println("Database Error");
+                    Start();
+                }
+            }
+
+
+
         }
 
     }
