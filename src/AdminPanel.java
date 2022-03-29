@@ -3,19 +3,19 @@ import java.sql.*;
 
 public class AdminPanel implements graphicvars, sql_vars {
 
-    public static void main(String args[]) throws SQLException{
+    public static void main(String[] args) throws SQLException {
 
         Start();
 
     }
 
-    static void Start() throws SQLException{
+    static void Start() throws SQLException {
         Scanner sc = new Scanner(System.in);
         Connection connection = DriverManager.getConnection(conn, username, password);
         System.out.println(welcome);
         System.out.println(menu);
         int ch = sc.nextInt();
-        switch(ch){
+        switch (ch) {
             case 1:
                 initiateDocDB(connection, sc);
                 break;
@@ -30,81 +30,138 @@ public class AdminPanel implements graphicvars, sql_vars {
                 Start();
         }
     }
+
     //Doctor Table (CREATE and READ)
-    static void initiateDocDB(Connection conn, Scanner sc) throws SQLException{
+    static void initiateDocDB(Connection conn, Scanner sc) throws SQLException {
         System.out.println(docMenu);
         int ch = sc.nextInt();
-        if(ch == 1){
+        if (ch == 1) {
             PreparedStatement preparedStatement = conn.prepareStatement(C_Doc_Query);
             System.out.println("Enter Name");
-            preparedStatement.setString(1, sc.nextLine());
+            String name = sc.nextLine();
+            preparedStatement.setString(1, name);
             System.out.println("Enter Email-ID");
-            preparedStatement.setString(2, sc.nextLine());
-            preparedStatement.setString(3, "Ushnish05");
-            preparedStatement.setString(4, "24, Kailash Nagar");
-            preparedStatement.setString(5, "9619367495");
-            preparedStatement.setString(6, "30000");
-            preparedStatement.setInt(7, 1);
+            String email = sc.nextLine();
+            preparedStatement.setString(2, email);
+            boolean bool = false;
+            while (!bool) {
+                System.out.println("Enter Password");
+                String temp = sc.nextLine();
+                System.out.println("Re-enter Password");
+                String password = sc.nextLine();
+                if (temp.equals(password)) {
+                    preparedStatement.setString(3, password);
+                    bool = true;
+                } else {
+                    System.out.println("Password mismatch");
+                }
+            }
+            System.out.println("Enter Address");
+            String address = sc.nextLine();
+            preparedStatement.setString(4, address);
+            System.out.println("Enter Phone No.");
+            String phoneno = sc.nextLine();
+            preparedStatement.setString(5, phoneno);
+            System.out.println("Enter Fees");
+            String fees = sc.nextLine();
+            preparedStatement.setString(6, fees);
+            System.out.println("Enter Specialisation");
+            int specs = sc.nextInt();
+            preparedStatement.setInt(7, specs);
             int num = preparedStatement.executeUpdate();
-            if(num > 0) System.out.println("Doctor Registered");
+            if (num > 0) {
+                System.out.println("Doctor Registered");
+                //Menu TO-DO
+            } else {
+                System.out.println("Database Error");
+                Start();
+            }
 
-        } else if(ch == 2){
+        } else if (ch == 2) {
             String query = R_Query + "doctor_table";
             ResultSet result = readData(conn, query);
-            while(result.next()){
-                System.out.println(result.getString("doc_name")+"\n"+result.getString("email")+"\n"+result.getString("address")+"\n"+result.getString("mobileno")+"\n"+result.getString("fees")+"\n"+result.getInt("specialisation_id"));
+            while (result.next()) {
+                System.out.println(result.getString("doc_name") + "\n" + result.getString("email") + "\n" + result.getString("address") + "\n" + result.getString("mobileno") + "\n" + result.getString("fees") + "\n" + result.getInt("specialisation_id") + "\n\n");
             }
+        } else {
+            System.out.println("Choice doesn't exist");
+            initiateDocDB(conn, sc);
         }
 
 
     }
-    static ResultSet readData(Connection conn, String query) throws SQLException{
+
+    static ResultSet readData(Connection conn, String query) throws SQLException {
         Statement statement = conn.createStatement();
         return statement.executeQuery(query);
     }
-
-    static void initiatePatientsDB(Connection conn, Scanner sc) throws SQLException{
+    //Patients Table (CREATE, READ, UPDATE, DELETE)
+    static void initiatePatientsDB(Connection conn, Scanner sc) throws SQLException {
         System.out.println(pMenu);
         int ch = sc.nextInt();
-        switch(ch){
-            case 1:
-                PreparedStatement preparedStatement = conn.prepareStatement(C_Ptnt_Query);
-                System.out.println("Enter Patient Name");
-                preparedStatement.setString(1, sc.nextLine());
-                System.out.println("Enter Patient Email ID");
-                preparedStatement.setString(2, sc.next());
-                boolean bool = false;
-                while(!bool){
-                    System.out.println("Enter Account Password");
-                    String temp = sc.next();
-                    System.out.println("Re-enter Password");
-                    String temp2 = sc.next();
-                    if(temp.equals(temp2)){
-                        preparedStatement.setString(3, temp2);
-                        bool = true;
-                    }
-                    else{
-                        System.out.println("Passwords Do Not Match");
+        if (ch == 1) {
+            PreparedStatement preparedStatement = conn.prepareStatement(C_Ptnt_Query);
+            System.out.println("Enter Patient Name");
+            preparedStatement.setString(1, sc.nextLine());
+            System.out.println("Enter Patient Email ID");
+            preparedStatement.setString(2, sc.next());
+            boolean bool = false;
+            while (!bool) {
+                System.out.println("Enter Account Password");
+                String temp = sc.next();
+                System.out.println("Re-enter Password");
+                String temp2 = sc.next();
+                if (temp.equals(temp2)) {
+                    preparedStatement.setString(3, temp2);
+                    bool = true;
+                } else {
+                    System.out.println("Passwords Do Not Match");
 
-                    }
                 }
-                boolean bool2 = false;
-               while(!bool2){
-                   System.out.println("Enter Patient Gender.\n(M) for Male. (F) for Female. (T) for Transgenders.");
-                   String g = sc.next();
-                   if(g.equals("M") || g.equals("m") || g.equals("F") || g.equals("f") || g.equals("T") || g.equals("t")){
-                       preparedStatement.setString(4, g);
-                       bool2 = true;
+            }
+            bool = false;
+            while (!bool) {
+                System.out.println("Enter Patient Gender.\n(M) for Male. (F) for Female. (T) for Transgenders.");
+                String g = sc.next();
+                if (g.equals("M") || g.equals("m") || g.equals("F") || g.equals("f") || g.equals("T") || g.equals("t")) {
+                    preparedStatement.setString(4, g);
+                    bool = true;
 
-                   }else{
-                       System.out.println("Choice incorrect.");
-                   }
-               }
-               //TO-DO
-//             //System.out.println("Enter Patient Name");
-//             // System.out.println("Enter Patient Name");
+                } else {
+                    System.out.println("Choice incorrect.");
+                }
+            }
+            System.out.println("Enter Mobile Number");
+            String mobileno = sc.next();
+            preparedStatement.setString(5, mobileno);
+            System.out.println("Enter Address");
+            String address = sc.nextLine();
+            preparedStatement.setString(6, address);
+            System.out.println("Enter Age");
+            int age = sc.nextInt();
+            preparedStatement.setInt(7, age);
+            System.out.println("Enter Prescription ID");
+            int pres_id = sc.nextInt();
+            preparedStatement.setInt(8, pres_id);
+            int num = preparedStatement.executeUpdate();
+            if (num > 0) {
+                System.out.println("Doctor Registered");
+                //Menu TO-DO
+            } else {
+                System.out.println("Database Error");
+                Start();
+            }
+        }
+        else if(ch==2){
+            String query = R_Query + "patients_table";
+            ResultSet result = readData(conn, query);
+            while(result.next()){
+                System.out.println(result.getString("p_name") + "\n" + result.getInt("age") + "\n" + result.getString("email") + "\n" + result.getString("gender") + "\n" + result.getString("address") + "\n" + result.getString("mobileno") + "\n" + result.getInt("prescription_id") + "\n\n");
+            }
         }
 
     }
+
+
 
 }
