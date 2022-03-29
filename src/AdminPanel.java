@@ -23,7 +23,10 @@ public class AdminPanel implements graphicvars, sql_vars {
                 initiatePatientsDB(connection, sc);
                 break;
             case 3:
-                //initiateReceptionistDB(connection); TO-DO
+                //initiateReceptionistDB(connection, sc); TO-DO
+                break;
+            case 4:
+                //initiatePaymentsDB(connection, sc};
                 break;
             default:
                 System.out.println("Choice doesn't exist");
@@ -95,6 +98,7 @@ public class AdminPanel implements graphicvars, sql_vars {
         Statement statement = conn.createStatement();
         return statement.executeQuery(query);
     }
+
     //Patients Table (CREATE, READ, UPDATE, DELETE)
     static void initiatePatientsDB(Connection conn, Scanner sc) throws SQLException {
         System.out.println(pMenu);
@@ -151,20 +155,18 @@ public class AdminPanel implements graphicvars, sql_vars {
                 System.out.println("Database Error");
                 Start();
             }
-        }
-        else if(ch==2){
+        } else if (ch == 2) {
             String query = R_Query + "patients_table";
             ResultSet result = readData(conn, query);
-            while(result.next()){
+            while (result.next()) {
                 System.out.println(result.getString("p_name") + "\n" + result.getInt("age") + "\n" + result.getString("email") + "\n" + result.getString("gender") + "\n" + result.getString("address") + "\n" + result.getString("mobileno") + "\n" + result.getInt("prescription_id") + "\n\n");
             }
-        }
-        else if(ch == 3){
+        } else if (ch == 3) {
             System.out.println("Enter Patient ID");
             int ID = sc.nextInt();
             Statement statement = conn.createStatement();
             ResultSet result = statement.executeQuery(R_Ptnt_Query_Specific + ID);
-            if(result.next()){
+            if (result.next()) {
                 System.out.println("Enter Patient Name");
                 String name = sc.nextLine();
                 System.out.println("Enter Patient Email ID");
@@ -206,7 +208,7 @@ public class AdminPanel implements graphicvars, sql_vars {
                 System.out.println("Enter Prescription ID");
                 int pres_id = sc.nextInt();
 
-                String query = U_Ptnt_Query + "p_name = '" + name + "', email = '" + email + "' password = '" + pass + "' gender = '" + gender + "' mobileno = '" + mobileno + "' address = '" + address + "' age = '" + age + "' prescription_id = '" + pres_id + "' "+ U_Ptnt_Query_2 + ID;
+                String query = U_Ptnt_Query + "p_name = '" + name + "', email = '" + email + "' password = '" + pass + "' gender = '" + gender + "' mobileno = '" + mobileno + "' address = '" + address + "' age = '" + age + "' prescription_id = '" + pres_id + "' " + U_Ptnt_Query_2 + ID;
                 PreparedStatement preparedStatement = conn.prepareStatement(query);
                 int num = preparedStatement.executeUpdate();
                 if (num > 0) {
@@ -216,14 +218,29 @@ public class AdminPanel implements graphicvars, sql_vars {
                     System.out.println("Database Error");
                     Start();
                 }
+            } else {
+                System.out.println("ID doesn't exist");
+                initiatePatientsDB(conn, sc);
             }
-
-
-
+        } else if (ch == 4) {
+            System.out.println("Enter Patient ID");
+            int ID = sc.nextInt();
+            Statement statement = conn.createStatement();
+            ResultSet result = statement.executeQuery(R_Ptnt_Query_Specific + ID);
+            if (result.next()) {
+                PreparedStatement preparedStatement = conn.prepareStatement(D_Ptnt_Query + ID);
+                int num = preparedStatement.executeUpdate();
+                if (num > 0) {
+                    System.out.println("Patient Deleted");
+                    //Menu TO-DO
+                } else {
+                    System.out.println("Database Error");
+                    Start();
+                }
+            } else {
+                System.out.println("ID doesn't exist");
+                initiatePatientsDB(conn, sc);
+            }
         }
-
     }
-
-
-
 }

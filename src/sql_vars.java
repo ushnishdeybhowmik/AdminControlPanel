@@ -11,4 +11,5 @@ public interface sql_vars {
     String C_Ptnt_Query = "INSERT INTO patients_table(p_name, email, password, gender, mobileno, address, age, prescription_id) VALUES(?,?,?,?,?,?,?,?)";
     String U_Ptnt_Query = "UPDATE patients_table SET ";
     String U_Ptnt_Query_2 = "WHERE p_id = ";
+    String D_Ptnt_Query = "DELETE FROM patients_table WHERE p_id = ";
 }
