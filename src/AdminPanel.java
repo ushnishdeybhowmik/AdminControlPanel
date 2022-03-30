@@ -23,13 +23,15 @@ public class AdminPanel implements graphicvars, sql_vars {
                 initiatePatientsDB(connection, sc);
                 break;
             case 3:
-                //initiateReceptionistDB(connection, sc); TO-DO
+                initiateReceptionistDB(connection, sc);
                 break;
             case 4:
                 //initiatePaymentsDB(connection, sc};
                 break;
+            case 5:
+                System.out.println("Exiting Application");
             default:
-                System.out.println("Choice doesn't exist");
+                System.out.println(wrongch);
                 Start();
         }
     }
@@ -56,38 +58,40 @@ public class AdminPanel implements graphicvars, sql_vars {
                     preparedStatement.setString(3, password);
                     bool = true;
                 } else {
-                    System.out.println("Password mismatch");
+                    System.out.println(passErr);
                 }
             }
             System.out.println("Enter Address");
             String address = sc.nextLine();
             preparedStatement.setString(4, address);
             System.out.println("Enter Phone No.");
-            String phoneno = sc.nextLine();
-            preparedStatement.setString(5, phoneno);
+            String mobileno = sc.nextLine();
+            preparedStatement.setString(5, mobileno);
             System.out.println("Enter Fees");
             String fees = sc.nextLine();
             preparedStatement.setString(6, fees);
-            System.out.println("Enter Specialisation");
+            System.out.println("Enter Specialisation ID");
             int specs = sc.nextInt();
             preparedStatement.setInt(7, specs);
             int num = preparedStatement.executeUpdate();
             if (num > 0) {
                 System.out.println("Doctor Registered");
-                //Menu TO-DO
+                initiateDocDB(conn, sc);
             } else {
-                System.out.println("Database Error");
+                System.out.println(dbErr);
                 Start();
             }
 
         } else if (ch == 2) {
-            String query = R_Query + "doctor_table";
+            String query = R_Query + doc_table;
             ResultSet result = readData(conn, query);
             while (result.next()) {
                 System.out.println(result.getString("doc_name") + "\n" + result.getString("email") + "\n" + result.getString("address") + "\n" + result.getString("mobileno") + "\n" + result.getString("fees") + "\n" + result.getInt("specialisation_id") + "\n\n");
             }
+            System.out.println("\n");
+            initiateDocDB(conn, sc);
         } else {
-            System.out.println("Choice doesn't exist");
+            System.out.println(wrongch);
             initiateDocDB(conn, sc);
         }
 
@@ -119,20 +123,20 @@ public class AdminPanel implements graphicvars, sql_vars {
                     preparedStatement.setString(3, temp2);
                     bool = true;
                 } else {
-                    System.out.println("Passwords Do Not Match");
+                    System.out.println(passErr);
 
                 }
             }
             bool = false;
             while (!bool) {
-                System.out.println("Enter Patient Gender.\n(M) for Male. (F) for Female. (T) for Transgenders.");
+                System.out.println(gMenu);
                 String g = sc.next();
                 if (g.equals("M") || g.equals("m") || g.equals("F") || g.equals("f") || g.equals("T") || g.equals("t")) {
                     preparedStatement.setString(4, g);
                     bool = true;
 
                 } else {
-                    System.out.println("Choice incorrect.");
+                    System.out.println(wrongch);
                 }
             }
             System.out.println("Enter Mobile Number");
@@ -150,17 +154,19 @@ public class AdminPanel implements graphicvars, sql_vars {
             int num = preparedStatement.executeUpdate();
             if (num > 0) {
                 System.out.println("Patient Registered");
-                //Menu TO-DO
+                initiatePatientsDB(conn, sc);
             } else {
-                System.out.println("Database Error");
+                System.out.println(dbErr);
                 Start();
             }
         } else if (ch == 2) {
-            String query = R_Query + "patients_table";
+            String query = R_Query + patient_table;
             ResultSet result = readData(conn, query);
             while (result.next()) {
                 System.out.println(result.getString("p_name") + "\n" + result.getInt("age") + "\n" + result.getString("email") + "\n" + result.getString("gender") + "\n" + result.getString("address") + "\n" + result.getString("mobileno") + "\n" + result.getInt("prescription_id") + "\n\n");
             }
+            System.out.println("\n");
+            initiatePatientsDB(conn, sc);
         } else if (ch == 3) {
             System.out.println("Enter Patient ID");
             int ID = sc.nextInt();
@@ -182,7 +188,7 @@ public class AdminPanel implements graphicvars, sql_vars {
                         pass = temp;
                         bool = true;
                     } else {
-                        System.out.println("Passwords Do Not Match");
+                        System.out.println(passErr);
 
                     }
                 }
@@ -196,7 +202,7 @@ public class AdminPanel implements graphicvars, sql_vars {
                         bool = true;
 
                     } else {
-                        System.out.println("Choice incorrect.");
+                        System.out.println(wrongch);
                     }
                 }
                 System.out.println("Enter Mobile Number");
@@ -213,9 +219,9 @@ public class AdminPanel implements graphicvars, sql_vars {
                 int num = preparedStatement.executeUpdate();
                 if (num > 0) {
                     System.out.println("Patient Updated");
-                    //Menu TO-DO
+                    initiatePatientsDB(conn, sc);
                 } else {
-                    System.out.println("Database Error");
+                    System.out.println(dbErr);
                     Start();
                 }
             } else {
@@ -232,15 +238,79 @@ public class AdminPanel implements graphicvars, sql_vars {
                 int num = preparedStatement.executeUpdate();
                 if (num > 0) {
                     System.out.println("Patient Deleted");
-                    //Menu TO-DO
+                    initiatePatientsDB(conn, sc);
                 } else {
-                    System.out.println("Database Error");
+                    System.out.println(dbErr);
                     Start();
                 }
             } else {
                 System.out.println("ID doesn't exist");
                 initiatePatientsDB(conn, sc);
             }
+        } else {
+            System.out.println(wrongch);
+            initiatePatientsDB(conn, sc);
         }
+    }
+    //ReceptionistDB
+    static void initiateReceptionistDB(Connection conn, Scanner sc) throws SQLException {
+        System.out.println(rMenu);
+        int ch = sc.nextInt();
+        if (ch == 1) {
+            PreparedStatement preparedStatement = conn.prepareStatement(C_Rec_Query);
+            System.out.println("Enter Name");
+            String name = sc.nextLine();
+            preparedStatement.setString(1, name);
+            System.out.println("Enter Email-ID");
+            String email = sc.nextLine();
+            preparedStatement.setString(2, email);
+            boolean bool = false;
+            while (!bool) {
+                System.out.println("Enter Password");
+                String temp = sc.nextLine();
+                System.out.println("Re-enter Password");
+                String password = sc.nextLine();
+                if (temp.equals(password)) {
+                    preparedStatement.setString(3, password);
+                    bool = true;
+                } else {
+                    System.out.println(passErr);
+                }
+            }
+            System.out.println("Enter Mobile No.");
+            String mobileno = sc.nextLine();
+            preparedStatement.setString(5, mobileno);
+            System.out.println("Enter Address");
+            String address = sc.nextLine();
+            preparedStatement.setString(4, address);
+            System.out.println("Enter Fees");
+            String fees = sc.nextLine();
+            preparedStatement.setString(6, fees);
+            System.out.println("Enter Age");
+            int age = sc.nextInt();
+            preparedStatement.setInt(7, age);
+            int num = preparedStatement.executeUpdate();
+            if (num > 0) {
+                System.out.println("Receptionist Registered");
+                initiateReceptionistDB(conn, sc);
+            } else {
+                System.out.println(dbErr);
+                Start();
+            }
+
+        } else if (ch == 2) {
+            String query = R_Query + receptionists_table;
+            ResultSet result = readData(conn, query);
+            while (result.next()) {
+                System.out.println(result.getString("rec_name") + "\n" + result.getString("email") + "\n" + result.getString("address") + "\n" + result.getString("mobileno") + "\n\n");
+            }
+            System.out.println("\n");
+            initiateReceptionistDB(conn, sc);
+        } else {
+            System.out.println(wrongch);
+            initiateReceptionistDB(conn, sc);
+        }
+
+
     }
 }
