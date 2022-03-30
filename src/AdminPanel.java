@@ -26,7 +26,7 @@ public class AdminPanel implements graphicvars, sql_vars {
                 initiateReceptionistDB(connection, sc);
                 break;
             case 4:
-                //initiatePaymentsDB(connection, sc};
+                initiatePaymentsDB(connection, sc);
                 break;
             case 5:
                 System.out.println("Exiting Application");
@@ -252,7 +252,7 @@ public class AdminPanel implements graphicvars, sql_vars {
             initiatePatientsDB(conn, sc);
         }
     }
-    //ReceptionistDB
+    //ReceptionistDB (CREATE, READ)
     static void initiateReceptionistDB(Connection conn, Scanner sc) throws SQLException {
         System.out.println(rMenu);
         int ch = sc.nextInt();
@@ -283,9 +283,6 @@ public class AdminPanel implements graphicvars, sql_vars {
             System.out.println("Enter Address");
             String address = sc.nextLine();
             preparedStatement.setString(4, address);
-            System.out.println("Enter Fees");
-            String fees = sc.nextLine();
-            preparedStatement.setString(6, fees);
             System.out.println("Enter Age");
             int age = sc.nextInt();
             preparedStatement.setInt(7, age);
@@ -313,4 +310,41 @@ public class AdminPanel implements graphicvars, sql_vars {
 
 
     }
+    // PaymentsDB (READ, DELETE)
+    static void initiatePaymentsDB(Connection conn, Scanner sc) throws SQLException {
+        System.out.println(payMenu);
+        int ch = sc.nextInt();
+        if (ch == 1) {
+            String query = R_Query + payments_table;
+            ResultSet result = readData(conn, query);
+            while (result.next()) {
+                System.out.println(result.getInt("pay_id") + "\n" + result.getInt("p_id") + "\n" + result.getInt("doc_id") + "\n" + result.getString("amount") + "\n" + result.getBoolean("statusCompleted") + "\n\n");
+            }
+            System.out.println("\n");
+            initiatePaymentsDB(conn, sc);
+        } else if (ch == 2) {
+            System.out.println("Enter Payment ID");
+            int ID = sc.nextInt();
+            Statement statement = conn.createStatement();
+            ResultSet result = statement.executeQuery(R_Pay_Query_Specific + ID);
+            if (result.next()) {
+                PreparedStatement preparedStatement = conn.prepareStatement(D_Pay_Query + ID);
+                int num = preparedStatement.executeUpdate();
+                if (num > 0) {
+                    System.out.println("Payment Deleted");
+                    initiatePaymentsDB(conn, sc);
+                } else {
+                    System.out.println(dbErr);
+                    Start();
+                }
+            } else {
+                System.out.println("ID doesn't exist");
+                initiatePaymentsDB(conn, sc);
+            }
+        } else {
+            System.out.println(wrongch);
+            initiatePaymentsDB(conn, sc);
+        }
+    }
+
 }
